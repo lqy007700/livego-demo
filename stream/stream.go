@@ -38,3 +38,35 @@ func (s *Stream) Unsubscribe(ch chan *Packet) {
 		close(ch)
 	}
 }
+
+func (s *Stream) Broadcast(pkg *Packet) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.closed {
+		return
+	}
+
+	for ch := range s.subscribers {
+		// 不能阻塞 不能panic
+		// 丢帧 不能影响整体
+		select {
+		case ch <- pkg:
+		default:
+			// 缓存满了直接丢弃
+		}
+	}
+}
+
+func (s *Stream) Close() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.closed {
+		return
+	}
+
+	s.closed = true
+	for ch := range s.subscribers {
+		close(ch)
+	}
+	s.subscribers = nil
+}
