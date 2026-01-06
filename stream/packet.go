@@ -9,6 +9,6 @@ const (
 
 type Packet struct {
 	Type      PacketType
-	Timesetmp int32
+	Timesetmp uint32
 	Payload   []byte
 }
