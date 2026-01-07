@@ -1,0 +1,16 @@
+<video id="video" controls></video>
+<script src="https://cdn.jsdelivr.net/npm/flv.js/dist/flv.min.js"></script>
+<script>
+    if (flvjs.isSupported()) {
+        var flvPlayer = flvjs.createPlayer({
+            type: 'flv',
+            url: 'http://localhost:8081/live/test.flv'
+        });
+        flvPlayer.attachMediaElement(video);
+        flvPlayer.load();
+        flvPlayer.play();
+        flvPlayer.on(flvjs.Events.ERROR, (errType, errDetail, errInfo) => {
+            console.error('FLV error:', errType, errDetail, errInfo);
+        });
+    }
+</script>

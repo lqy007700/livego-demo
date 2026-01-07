@@ -1,0 +1,4 @@
+2026/01/06 16:03:02 RTMP server listening on :1935
+2026/01/06 16:03:02 HTTP-FLV server listening on :8081
+2026/01/06 16:03:02 RTMP server error:listen tcp :1935: bind: address already in use
+exit status 1

@@ -2,29 +2,27 @@ package main
 
 import (
 	"livego-demo/flv"
+	"livego-demo/rtmp"
 	"livego-demo/stream"
+	"log"
 	"net/http"
-	"time"
 )
 
 func main() {
 	manager := stream.NewManager()
-	// test publish stream
+
+	// http-flv
 	go func() {
-		st := manager.GetOrCreate("test")
-		ticker := time.NewTicker(40 * time.Millisecond)
-		defer ticker.Stop()
-		for {
-			<-ticker.C
-			pkg := &stream.Packet{
-				Type:      stream.PacketVideo,
-				Timesetmp: uint32(time.Now().UnixMilli()),
-				Payload:   []byte("Video-data\n"),
-			}
-			st.Broadcast(pkg)
+		http.Handle("/live/", flv.NewServer(manager))
+		log.Println("HTTP-FLV server listening on :8081")
+		if err := http.ListenAndServe(":8081", nil); err != nil {
+			log.Fatal("HTTP-FLV server error:", err)
 		}
 	}()
 
-	http.Handle("/live/", flv.NewServer(manager))
-	http.ListenAndServe(":8081", nil)
+	log.Println("RTMP server listening on :1935")
+	rtmpServer := rtmp.NewServer(manager)
+	if err := rtmpServer.Listen(":1935"); err != nil {
+		log.Fatal("RTMP server error:", err)
+	}
 }
